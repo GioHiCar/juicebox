@@ -1,10 +1,11 @@
-const { client } = require('./index');
+const { client, getAllUsers } = require('./index');
 
 async function testDB() {
     try {
         client.connect();
-        const result = await client.query(`SELECT * FROM users;`);
-        console.log(result);
+
+        const users = await getAllUsers();
+        console.log(users);
     } catch (error) {
         console.error(error);
     } finally {
