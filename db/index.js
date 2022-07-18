@@ -10,6 +10,14 @@ async function getAllUsers() {
 
         return rows;
 }
+async function getAllPosts() {
+    const {rows} = await client.query(
+        `SELECT id, "authorId", title, content, active 
+        FROM posts;
+        `);
+
+        return rows;
+}
 
 async function createUser({
     username, 
@@ -83,20 +91,25 @@ async function updateUser(id, fields = {}) {
     }
   }
 
-  async function updatePost(id, fields = {
-    title,
-    content,
-    active
-  }) {
-  const setString = Object.keys(fields).map(
-    (key, index) => `"${ key }"=$${ index + 1 }`
-  ).join(', ');
-      console.log(setString, 'setString')
-//   // return early if this is called without fields
-//   if (setString.length === 0) {
-//     return;
+  async function updatePost(id, fields = {title, content, active}) {
+    // build the set string
+    const setString = Object.keys(fields).map(
+      (key, index) => `"${ key }"=$${ index + 1 }`
+    ).join(', ');
+        console.log(setString, ' line 91 setString')
+    // return early if this is called without fields
+    if (setString.length === 0) {
+      return;
+    }
+  
     try {
-        const { rows: [post]} = await client.query(`
+        console.log(`
+        UPDATE posts
+        SET ${ setString }
+        WHERE id=${ id }
+        RETURNING *;
+      `)
+      const { rows: [user]} = await client.query(`
         UPDATE posts
         SET ${ setString }
         WHERE id=${ id }
@@ -108,6 +121,46 @@ async function updateUser(id, fields = {}) {
       throw error;
     }
   }
+
+  async function getPostsByUser(userId) {
+    try{
+      const { rows } = await client.query(`
+        SELECT * FROM posts
+        WHERE id=${ userId };
+      `);
+      console.log("this is the rows from 131", rows)
+      return rows
+    } catch (error) {
+      throw error;
+    }
+  }
+
+async function getUserById(userId) {
+    try {
+      const { rows:[user] } = await client.query(`
+        SELECT id, username, name, location, active
+        FROM users
+        WHERE id=${userId};
+      `);
+
+      if (user.length === 0) {
+        return null;
+      }
+      else {
+        delete user.password
+        const { posts } = await getPostsByUser(userId)
+        console.log("this is the userposts object", posts )
+
+        return user;
+      }
+
+    } catch (error) {
+      throw error;
+    }
+
+}
+
+
   
 module.exports = {
     client,
@@ -115,5 +168,8 @@ module.exports = {
     createUser,
     updateUser,
     createPost,
-    updatePost
+    updatePost,
+    getAllPosts,
+    getPostsByUser,
+    getUserById
 }
