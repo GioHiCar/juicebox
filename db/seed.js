@@ -5,6 +5,7 @@ async function dropTables() {
     console.log("starting to drop tables..");
 
     await client.query(`
+            DROP TABLE IF EXISTS posts;
             DROP TABLE IF EXISTS users;
         `);
 
@@ -27,7 +28,14 @@ async function createTables() {
             location VARCHAR(255) NOT NULL,
             active BOOLEAN DEFAULT true
             );
-        `);
+            CREATE TABLE posts (
+              id SERIAL PRIMARY KEY,
+              "authorId" INTEGER REFERENCES users(id) NOT NULL,
+              title VARCHAR(255) NOT NULL,
+              content TEXT NOT NULL,
+              active BOOLEAN DEFAULT true
+            );`
+        );
 
     console.log("Finishing building tables");
   } catch (error) {
@@ -35,6 +43,9 @@ async function createTables() {
     throw error;
   }
 }
+
+
+
 
 async function rebuildDB() {
   try {
@@ -51,16 +62,16 @@ async function rebuildDB() {
 async function testDB() {
   try {
     console.log("Starting to test database...");
-    console.log("Calling getAllUsers()")
+    console.log("Calling getAllUsers()");
     const users = await getAllUsers();
     console.log("Result:", users);
 
-    console.log("Calling updateUser on users[0]")
+    console.log("Calling updateUser on users[0]");
     const updateUserResult = await updateUser(users[0].id, {
       name: "Newname Sogood",
-      location: "Lesterville, KY"
+      location: "Lesterville, KY",
     });
-    console.log("Result:", updateUserResult)
+    //console.log("Result:", updateUserResult);
 
     console.log("finished database tests!");
   } catch (error) {
@@ -76,22 +87,22 @@ async function createInitialUsers() {
     await createUser({
       username: "albert",
       password: "bertie99",
-      name:'Al Bert',
-      location: 'Sidney Australia'
+      name: "Al Bert",
+      location: "Sidney Australia",
     });
 
-    await createUser({ 
-        username: "sandra", 
-        name:'just sandra',
-        password: "2sandy4me", 
-        location: `ain't tellin'`
+    await createUser({
+      username: "sandra",
+      name: "just sandra",
+      password: "2sandy4me",
+      location: `ain't tellin'`,
     });
 
-    await createUser({ 
-        username: "glamgal", 
-        password: "soglam",
-        name: '',
-        location: '' 
+    await createUser({
+      username: "glamgal",
+      password: "soglam",
+      name: "",
+      location: "",
     });
 
     console.log("Finished creating users!");
@@ -102,6 +113,6 @@ async function createInitialUsers() {
 }
 
 rebuildDB()
-  .then(testDB)
-  .catch(console.error)
-  .finally(() => client.end());
+.then(testDB)
+.catch(console.error)
+.finally(() => client.end());
