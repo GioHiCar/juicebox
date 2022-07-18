@@ -152,8 +152,34 @@ async function getUserById(userId) {
 
 }
 
+async function createTags(tagList) {
+  if (tagList.length === 0) {
+    return;
+  }
 
-  
+  const insertValues = tagList.map((_, index) => `$${index + 1}`).join("), (");
+
+  const selectValues = tagList.map((_, index) => `$${index + 1}`).join(", ");
+  // then we can use (${ selectValues }) in our string template
+
+  try {
+    // insert the tags, doing nothing on conflict
+    // returning nothing, we'll query after
+    const insert = 
+    await client.query(`INSERT INTO tags(id, name)
+    VALUES (${insertValues})
+    ON CONFLICT (tags) DO NOTHING;` , tagList);
+
+    const { rows } = 
+    await client.query( 
+    `SELECT * FROM tags
+    WHERE name IN (${selectValues})`, tagList)
+    return { rows };
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
     client,
     getAllUsers,
