@@ -1,4 +1,4 @@
-const { client, getAllUsers, createUser, updateUser, updatePost, getAllPosts, getPostsByUser, getUserById } = require("./index");
+const { client, getAllUsers, createUser, updateUser, updatePost, getAllPosts, getPostsByUser, getUserById, createPost } = require("./index");
 
 async function dropTables() {
   try {
@@ -54,6 +54,7 @@ async function rebuildDB() {
     await dropTables();
     await createTables();
     await createInitialUsers();
+    await createInitialPosts();
   } catch (error) {
     throw error;
   }
@@ -62,28 +63,65 @@ async function rebuildDB() {
 async function testDB() {
   try {
     console.log("Starting to test database...");
-    console.log("Calling getAllUsers()");
+
+    console.log("Calling getAllUsers");
     const users = await getAllUsers();
     console.log("Result:", users);
 
     console.log("Calling updateUser on users[0]");
     const updateUserResult = await updateUser(users[0].id, {
       name: "Newname Sogood",
-      location: "Lesterville, KY",
+      location: "Lesterville, KY"
     });
-    console.log('calling getUserById');
-    // const userById = await getUserById(1);
-    // console.log("result line 76", userById)
+    console.log("Result:", updateUserResult);
 
-    console.log('calling getAllPosts...');
-    const AllPosts = await getAllPosts();
-    console.log(AllPosts)
- 
+    console.log("Calling getAllPosts");
+    const posts = await getAllPosts();
+    console.log("Result:", posts);
 
-    console.log("finished database tests!");
+    console.log("Calling updatePost on posts[0]");
+    const updatePostResult = await updatePost(posts[0].id, {
+      title: "New Title",
+      content: "Updated Content"
+    });
+    console.log("Result:", updatePostResult);
+
+    console.log("Calling getUserById with 1");
+    const albert = await getUserById(1);
+    console.log("Result:", albert);
+
+    console.log("Finished database tests!");
   } catch (error) {
-    console.error("Error testing database!");
+    console.log("Error during testDB");
     throw error;
+  }
+}
+
+async function createInitialPosts() {
+  try{
+    const [albert, sandra, glamgal] = await getAllUsers();
+
+    await createPost({
+      authorId: albert.id,
+      title: 'Albert First Post',
+      content: "This is my first post. I hope I love writing blogs as much as I love writing them."
+    });
+
+    await createPost({
+      authorId: sandra.id,
+      title: 'Sandra First Post',
+      content: "Hi my name is Sandra. I love icecream. I eat it all the time."
+    });
+
+    await createPost({
+      authorId: glamgal.id,
+      title: 'Glamgal First Post',
+      content: "Heloo my friends."
+    });
+
+
+  } catch (error) {
+    throw error
   }
 }
 
@@ -108,8 +146,8 @@ async function createInitialUsers() {
     await createUser({
       username: "glamgal",
       password: "soglam",
-      name: "",
-      location: "",
+      name: "ruby",
+      location: "texas",
     });
 
     console.log("Finished creating users!");
