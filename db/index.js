@@ -180,6 +180,34 @@ async function createTags(tagList) {
   }
 }
 
+async function createPostTag(postId, tagId){
+  try{
+    await client.query(`
+      INSERT INTO post_tags("postId", "tagId")
+      VALUES ($1, $2)
+      ON CONFLICT ("postId", "tagId") DO NOTHING;
+    `, [postId, tagId]);
+  }
+  catch (error) {
+    throw error;
+  }
+}
+
+async function addTagsToPost (postId, tagList) {
+  try{
+    const createPostTagPromises = tagList.map(
+      tag => createPostTag(postId, tag.id)
+    );
+    await Promise.all(createPostTagPromises);
+    return await getPostById(postId);
+    console.log(createPostTagPromises, "this is createPostTagPromises from line 203")
+  }
+  catch (error) {
+    throw error;
+  }
+}
+
+
 module.exports = {
     client,
     getAllUsers,
@@ -189,5 +217,7 @@ module.exports = {
     updatePost,
     getAllPosts,
     getPostsByUser,
-    getUserById
+    getUserById,
+    createTags,
+    addTagsToPost
 }

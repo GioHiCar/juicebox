@@ -8,6 +8,8 @@ const {
   getPostsByUser,
   getUserById,
   createPost,
+  createTags,
+  addTagsToPost
 } = require("./index");
 
 async function dropTables() {
@@ -106,6 +108,10 @@ async function testDB() {
     console.log("Calling getUserById with 1");
     const albert = await getUserById(1);
     console.log("Result:", albert);
+
+    console.log("calling AddTagsToPost");
+    const coolio = await addTagsToPost();
+
 
     console.log("Finished database tests!");
   } catch (error) {
