@@ -9,7 +9,8 @@ const {
   getUserById,
   createPost,
   createTags,
-  addTagsToPost
+  addTagsToPost,
+  getPostsByTagName
 } = require("./index");
 
 async function dropTables() {
@@ -74,8 +75,8 @@ async function rebuildDB() {
     await createTables();
     await createInitialUsers();
     await createInitialPosts();
-    await createInitialTags();
   } catch (error) {
+    console.log("Error during rebuildDB")
     throw error;
   }
 }
@@ -110,6 +111,17 @@ async function testDB() {
     const albert = await getUserById(1);
     console.log("Result:", albert);
 
+    console.log("Calling updatePost on posts[1], only updating tags");
+    const updatePostTagsResult = await updatePost(posts[1].id, {
+      tags: ["#youcandoanything", "#redfish", "#bluefish"]
+    });
+    console.log("Result:", updatePostTagsResult);
+
+    console.log("Calling getPostsByTagName with #happy");
+    const postsWithHappy = await getPostsByTagName("#happy");
+    console.log("Result:", postsWithHappy);
+
+
     console.log("Finished database tests!");
   } catch (error) {
     console.log("Error during testDB");
@@ -121,24 +133,29 @@ async function createInitialPosts() {
   try {
     const [albert, sandra, glamgal] = await getAllUsers();
 
+    console.log('Starting to create posts...');
     await createPost({
       authorId: albert.id,
       title: "Albert First Post",
       content:
         "This is my first post. I hope I love writing blogs as much as I love writing them.",
+      tags: ["happy", "youcandoanything"]
     });
 
     await createPost({
       authorId: sandra.id,
       title: "Sandra First Post",
       content: "Hi my name is Sandra. I love icecream. I eat it all the time.",
+      tags: ["#happy", "#worst-day-ever"]
     });
 
     await createPost({
       authorId: glamgal.id,
       title: "Glamgal First Post",
-      content: "Heloo my friends.",
+      content: "Y'all are too sweet.",
+      tags: ["#happy", "#youcandoanything", "#canmandoeverything"]
     });
+    console.log('Finished creating posts!');
   } catch (error) {
     throw error;
   }
