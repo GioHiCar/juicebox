@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 
 jwt.sign({user}, process.env.JWT_SECRET)
 
+const token = jwt.sign({ id: 3, username: 'joshua' }, 'server secret');
 
 usersRouter.use((req, res, next) => {
     console.log("A request is being made to /users")
