@@ -10,6 +10,5 @@ tagsRouter.get('/', async (req, res) => {
     });
 })
 
-// here's a comment from Hunter
 
 module.exports = tagsRouter

@@ -1,6 +1,4 @@
 const { Client } = require('pg');
-const usersRouter = require('../api/users');
-
 const client = new Client('postgres://localhost:5432/juicebox-dev');
 
 async function getAllUsers() {
