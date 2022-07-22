@@ -1,7 +1,10 @@
 const express = require('express')
 const usersRouter = express.Router();
-const { getAllUsers, getUserByUsername, createUser } = require('../db');
+const { getAllUsers, getUserByUsername, createUser,  } = require('../db');
+// getUserById < if we're able to tackle the stretch goals, we'd use this.
 const jwt = require('jsonwebtoken');
+
+const { requireUser } = require("./utils");
 
 // jwt.sign({user}, process.env.JWT_SECRET)
 
@@ -94,6 +97,33 @@ usersRouter.post('/login', async (req, res, next) => {
       next({ name, message })
     } 
   });
+
+  // usersRouter.delete('/:userId', requireUser, async (req, res, next) => {
+  //   try {
+  //     console.log(req.params)
+  //     const user = await getUserById(req.params.userId);
+  
+  //     if (user === ) {
+  //       const updatedPost = await updatePost(, { active: false });
+  
+  //       res.send({ post: updatedPost });
+  //     } else {
+  //       // if there was a post, throw UnauthorizedUserError, otherwise throw PostNotFoundError
+  //       next(post ? { 
+  //         name: "UnauthorizedUserError",
+  //         message: "You cannot delete a post which is not yours"
+  //       } : {
+  //         name: "PostNotFoundError",
+  //         message: "That post does not exist"
+  //       });
+  //     }
+  
+  //   } catch ({ name, message }) {
+  //     next({ name, message })
+  //   }
+  // });
+
+
 
 
 module.exports = usersRouter;
